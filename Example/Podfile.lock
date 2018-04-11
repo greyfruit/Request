@@ -1,0 +1,16 @@
+PODS:
+  - Request (0.1.0)
+
+DEPENDENCIES:
+  - Request (from `../`)
+
+EXTERNAL SOURCES:
+  Request:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Request: 0f6e5cf292a9c484d67373ade55077a5f1165643
+
+PODFILE CHECKSUM: 5ca67358705d78e397d0870da31a98a220306e63
+
+COCOAPODS: 1.5.0

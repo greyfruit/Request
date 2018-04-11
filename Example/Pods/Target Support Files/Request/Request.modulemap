@@ -1,0 +1,6 @@
+framework module Request {
+  umbrella header "Request-umbrella.h"
+
+  export *
+  module * { export * }
+}
