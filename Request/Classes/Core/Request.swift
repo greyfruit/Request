@@ -36,33 +36,45 @@ public enum HTTPMethod: String {
 /**
  Basic request container, which helps to build HTTP request, perform it, and handle.
  */
-public class Request<RequestTarget: DataRequest> {
+public class Request<RequestTarget: Requestable> {
     
     /**
      Encapsulated class which helps to handle process of request executing.
      */
     private class OperationTaskHandler: OperationTaskDelegate {
         
+        /// Queue which be used to callback about events
         var callbackQueue: DispatchQueue?
+        
+        /// Closure which be used to callback about request completion
         var completionHandler: CompletionHandler?
+        
+        /// Closure which be used to callback about request progress
         var progressHandler: ProgressHandler?
+        
+        /// Retry count for request
         var retryCount: Int = 0
     }
     
     private var requestTarget: RequestTarget
-    
-    private var operationTaskHandler: OperationTaskHandler = OperationTaskHandler()
+    private var operationTaskHandler: OperationTaskHandler
     
     public init(requestTarget: RequestTarget) {
         self.requestTarget = requestTarget
+        self.operationTaskHandler = OperationTaskHandler()
     }
     
     public func perform() {
-        Provider.shared.perform(request: self.requestTarget, delegate: self.operationTaskHandler)
+        Provider.shared.perform(
+            request: self.requestTarget,
+            delegate: self.operationTaskHandler
+        )
     }
     
     public func cancel() {
-        Provider.shared.cancel(request: self.requestTarget)
+        Provider.shared.cancel(
+            request: self.requestTarget
+        )
     }
 }
 
@@ -119,7 +131,7 @@ extension Request {
      ````
      
      Request
-         .download(from: "http://sample.com/image.jpg")
+         .upload(file: "Documents/Images/avatar.jpeg", to: "http://sample.com/upload/userAvatar")
          .perform()
      
      ````
@@ -133,11 +145,48 @@ extension Request {
         return Request<UploadRequest>(requestTarget: UploadRequest(fileURL: fileURL, destinationURL: destinationURL))
     }
     
+    /**
+     
+     Creates **upload** request.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .upload(data: imageData, to: "http://sample.com/upload/userAvatar")
+         .perform()
+     
+     ````
+     
+     - Parameter fileURL: The path of file which be uploaded.
+     - Parameter destinationURL: The path where data will be uploaded.
+     - Returns: Request container to build upload HTTP request.
+     */
     @discardableResult
     static func upload(data fileData: Data, to destinationURL: URLConvertible) -> Request<UploadRequest> {
         return Request<UploadRequest>(requestTarget: UploadRequest(fileData: fileData, destinationURL: destinationURL))
     }
     
+    /**
+     
+     Creates **upload** request.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .multipart(multipartFormData: {
+             $0.append(fileData: imageData, fieldName: "userAvatar", fileName: "avatar.jpeg", mimeType: "image/jpeg")
+             $0.append(fileData: instructionsData, fieldName: "instructions", fileName: "instructions.pdf", mimeType: "application/pdf")
+         }, to: "http://sample.com/uploadResources")
+         .perform()
+     
+     ````
+     
+     - Parameter fileURL: The path of file which be uploaded.
+     - Parameter destinationURL: The path where data will be uploaded.
+     - Returns: Request container to build upload HTTP request.
+     */
     @discardableResult
     static func multipart(multipartFormData: MultipartRequest.MultipartFormDataPreparation, to destinationURL: URLConvertible) -> Request<MultipartRequest> {
         return Request<MultipartRequest>(requestTarget: MultipartRequest(multipartFormDataPreparation: multipartFormData, destinationURL: destinationURL))
