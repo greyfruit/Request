@@ -8,63 +8,25 @@
 
 import Foundation
 
-public func handle(result: Result<Response, Error>, onSuccess: ((Response) -> Void)? = nil, onError: ((Error) -> Void)? = nil) {
-    switch result {
-    case let .failure(error):
-        onError?(error)
-    case let .success(response):
-        onSuccess?(response)
-    }
-}
-
-enum ResponseHandlerError: Error {
-    case url
-    case statusCode
-    case unknown
-}
-
+/// Protocol which represents response handler object
 public protocol ResponseHandlerType {
     
     func handle(data: Data?, response: URLResponse?, error: Error?) -> Result<Response, Error>
 }
 
+/**
+ Basic requests response handler
+ */
 public struct ResponseHandler: ResponseHandlerType {
     
-    public init() {
-        
+    /// Response handler errors
+    enum ResponseHandlerError: Error {
+        case url
+        case statusCode
+        case unknown
     }
     
-    private func snatch(_ error: Error?) throws {
-        if let error = error as? URLError {
-            switch error.code {
-            case URLError.Code.badURL:
-                throw ResponseHandlerError.url
-            default:
-                throw ResponseHandlerError.unknown
-            }
-        }
-    }
-    
-    private func validate(_ response: URLResponse?) throws {
-        
-        guard let response = response as? HTTPURLResponse else {
-            return
-        }
-        
-        guard (200...299).contains(response.statusCode) else {
-            throw ResponseHandlerError.statusCode
-        }
-    }
-    
-    private func compose(_ data: Data?) throws -> Response {
-        
-        guard let data = data else {
-            throw ResponseHandlerError.unknown
-        }
-        
-        return Response(data: data)
-    }
-    
+    /// Method which determines result by input data, response and error
     public func handle(data: Data?, response: URLResponse?, error: Error?) -> Result<Response, Error> {
         do {
             
@@ -76,5 +38,42 @@ public struct ResponseHandler: ResponseHandlerType {
         } catch (let handlerError) {
             return Result.failure(error: error ?? handlerError)
         }
+    }
+}
+
+private extension ResponseHandler {
+    
+    /// Snatching response error
+    private func snatch(_ error: Error?) throws {
+        if let error = error as? URLError {
+            switch error.code {
+            case URLError.Code.badURL:
+                throw ResponseHandlerError.url
+            default:
+                throw ResponseHandlerError.unknown
+            }
+        }
+    }
+    
+    /// Validating response status code
+    private func validate(_ response: URLResponse?) throws {
+        
+        guard let response = response as? HTTPURLResponse else {
+            return
+        }
+        
+        guard (200...299).contains(response.statusCode) else {
+            throw ResponseHandlerError.statusCode
+        }
+    }
+    
+    /// Data composing
+    private func compose(_ data: Data?) throws -> Response {
+        
+        guard let data = data else {
+            throw ResponseHandlerError.unknown
+        }
+        
+        return Response(data: data)
     }
 }

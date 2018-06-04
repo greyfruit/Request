@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Protocols composition which represents requestable object which can be performed by the system
 public typealias Requestable = URLRequestConvertible & URLSessionTaskConvertible
 
 public enum URLConvertibleError: Error {

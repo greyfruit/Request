@@ -18,6 +18,23 @@
 		63570DAA20C53F70005D189A /* RequestEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DA220C53F70005D189A /* RequestEncoder.swift */; };
 		63570DAB20C53F70005D189A /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DA320C53F70005D189A /* Response.swift */; };
 		63570DAC20C53F70005D189A /* ResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DA420C53F70005D189A /* ResponseHandler.swift */; };
+		63570DB220C5429F005D189A /* DataRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DB120C5429F005D189A /* DataRequest.swift */; };
+		63570DB520C54522005D189A /* DownloadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DB420C54522005D189A /* DownloadRequest.swift */; };
+		63570DB720C5452D005D189A /* UploadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DB620C5452D005D189A /* UploadRequest.swift */; };
+		63570DB920C54535005D189A /* MultipartRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DB820C54535005D189A /* MultipartRequest.swift */; };
+		63570DBA20C54A70005D189A /* Requestable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DA120C53F70005D189A /* Requestable.swift */; };
+		63570DBB20C54A70005D189A /* DataConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570D9D20C53F70005D189A /* DataConvertible.swift */; };
+		63570DBC20C54A70005D189A /* Request.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DA020C53F70005D189A /* Request.swift */; };
+		63570DBD20C54A70005D189A /* DataRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DB120C5429F005D189A /* DataRequest.swift */; };
+		63570DBE20C54A70005D189A /* DownloadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DB420C54522005D189A /* DownloadRequest.swift */; };
+		63570DBF20C54A70005D189A /* UploadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DB620C5452D005D189A /* UploadRequest.swift */; };
+		63570DC020C54A70005D189A /* MultipartRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DB820C54535005D189A /* MultipartRequest.swift */; };
+		63570DC120C54A70005D189A /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570D9F20C53F70005D189A /* Provider.swift */; };
+		63570DC220C54A70005D189A /* RequestEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DA220C53F70005D189A /* RequestEncoder.swift */; };
+		63570DC320C54A70005D189A /* ResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DA420C53F70005D189A /* ResponseHandler.swift */; };
+		63570DC420C54A70005D189A /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63570DA320C53F70005D189A /* Response.swift */; };
+		63D4863120C583D20022A8D8 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D4863020C583D20022A8D8 /* Helpers.swift */; };
+		63D4863220C584600022A8D8 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D4863020C583D20022A8D8 /* Helpers.swift */; };
 		95311F198D8B89D6D23F176828D08D91 /* Request-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 92D8B7B8C7D9FA976F2EAE9DC175A256 /* Request-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DCF7D0369E109F675C37565CAB3A76F8 /* Pods-Request_Tests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3AB5FC546B29FED39E61E2E2F389B8 /* Pods-Request_Tests-dummy.m */; };
 /* End PBXBuildFile section */
@@ -51,6 +68,11 @@
 		63570DA220C53F70005D189A /* RequestEncoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestEncoder.swift; sourceTree = "<group>"; };
 		63570DA320C53F70005D189A /* Response.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
 		63570DA420C53F70005D189A /* ResponseHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResponseHandler.swift; sourceTree = "<group>"; };
+		63570DB120C5429F005D189A /* DataRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataRequest.swift; sourceTree = "<group>"; };
+		63570DB420C54522005D189A /* DownloadRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadRequest.swift; sourceTree = "<group>"; };
+		63570DB620C5452D005D189A /* UploadRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadRequest.swift; sourceTree = "<group>"; };
+		63570DB820C54535005D189A /* MultipartRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipartRequest.swift; sourceTree = "<group>"; };
+		63D4863020C583D20022A8D8 /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		6E2F6383A5002B63C5BD0939C36C30C4 /* Request.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.module; path = Request.modulemap; sourceTree = "<group>"; };
 		7E4B6E4427181E578B8012AD8B76FFE2 /* Request.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Request.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -88,6 +110,7 @@
 		63570D9C20C53F70005D189A /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				63D4862F20C583C90022A8D8 /* Helpers */,
 				63570DAD20C540FA005D189A /* Protocols */,
 				63570DAE20C5414D005D189A /* Request */,
 				63570DAF20C5415D005D189A /* Provider */,
@@ -110,6 +133,10 @@
 			isa = PBXGroup;
 			children = (
 				63570DA020C53F70005D189A /* Request.swift */,
+				63570DB120C5429F005D189A /* DataRequest.swift */,
+				63570DB420C54522005D189A /* DownloadRequest.swift */,
+				63570DB620C5452D005D189A /* UploadRequest.swift */,
+				63570DB820C54535005D189A /* MultipartRequest.swift */,
 			);
 			path = Request;
 			sourceTree = "<group>";
@@ -130,6 +157,14 @@
 				63570DA320C53F70005D189A /* Response.swift */,
 			);
 			path = Response;
+			sourceTree = "<group>";
+		};
+		63D4862F20C583C90022A8D8 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				63D4863020C583D20022A8D8 /* Helpers.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		66A18FE2F73344D7E72E35C4DC41905A /* Pods-Request_Tests */ = {
@@ -334,7 +369,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63570DBF20C54A70005D189A /* UploadRequest.swift in Sources */,
 				21170431C49F5C2071493E649A0DE498 /* Request-dummy.m in Sources */,
+				63570DBE20C54A70005D189A /* DownloadRequest.swift in Sources */,
+				63570DC320C54A70005D189A /* ResponseHandler.swift in Sources */,
+				63570DC420C54A70005D189A /* Response.swift in Sources */,
+				63570DBD20C54A70005D189A /* DataRequest.swift in Sources */,
+				63570DC120C54A70005D189A /* Provider.swift in Sources */,
+				63570DC020C54A70005D189A /* MultipartRequest.swift in Sources */,
+				63570DBC20C54A70005D189A /* Request.swift in Sources */,
+				63570DBA20C54A70005D189A /* Requestable.swift in Sources */,
+				63D4863220C584600022A8D8 /* Helpers.swift in Sources */,
+				63570DC220C54A70005D189A /* RequestEncoder.swift in Sources */,
+				63570DBB20C54A70005D189A /* DataConvertible.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,12 +389,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63570DB220C5429F005D189A /* DataRequest.swift in Sources */,
 				63570DA920C53F70005D189A /* Requestable.swift in Sources */,
 				63570DA820C53F70005D189A /* Request.swift in Sources */,
+				63570DB520C54522005D189A /* DownloadRequest.swift in Sources */,
 				63570DAA20C53F70005D189A /* RequestEncoder.swift in Sources */,
+				63570DB720C5452D005D189A /* UploadRequest.swift in Sources */,
 				63570DA720C53F70005D189A /* Provider.swift in Sources */,
 				63570DAC20C53F70005D189A /* ResponseHandler.swift in Sources */,
+				63570DB920C54535005D189A /* MultipartRequest.swift in Sources */,
 				63570DAB20C53F70005D189A /* Response.swift in Sources */,
+				63D4863120C583D20022A8D8 /* Helpers.swift in Sources */,
 				63570DA520C53F70005D189A /* DataConvertible.swift in Sources */,
 				DCF7D0369E109F675C37565CAB3A76F8 /* Pods-Request_Tests-dummy.m in Sources */,
 			);
@@ -382,7 +434,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "Target Support Files/Pods-Request_Tests/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-Request_Tests/Pods-Request_Tests.modulemap";
@@ -395,7 +447,7 @@
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -607,7 +659,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "Target Support Files/Pods-Request_Tests/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACH_O_TYPE = staticlib;
 				MODULEMAP_FILE = "Target Support Files/Pods-Request_Tests/Pods-Request_Tests.modulemap";
@@ -619,7 +671,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";

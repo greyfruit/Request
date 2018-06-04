@@ -36,7 +36,7 @@ public enum HTTPMethod: String {
 /**
  Basic request container, which helps to build HTTP request, perform it, and handle.
  */
-public class Request<RequestTarget: Requestable> {
+public class Request<RequestTarget: DataRequest> {
     
     /**
      Encapsulated class which helps to handle process of request executing.
@@ -63,15 +63,31 @@ public class Request<RequestTarget: Requestable> {
         self.requestTarget = requestTarget
         self.operationTaskHandler = OperationTaskHandler()
     }
+}
+
+/**
+ Request executing
+ */
+public extension Request {
     
-    public func perform() {
+    /**
+     Function which start executing of request in default provider
+     */
+    @discardableResult
+    func perform() -> Self {
+        
         Provider.shared.perform(
             request: self.requestTarget,
             delegate: self.operationTaskHandler
         )
+        
+        return self
     }
     
-    public func cancel() {
+    /**
+     Function which canceling executing of request
+     */
+    func cancel() {
         Provider.shared.cancel(
             request: self.requestTarget
         )
@@ -88,8 +104,8 @@ public extension Request {
      ````
      
      Request
-     .plain("http://sample.com/path")
-     .perform()
+         .plain("http://sample.com/path")
+         .perform()
      
      ````
      
@@ -98,7 +114,11 @@ public extension Request {
      */
     @discardableResult
     static func plain(_ url: URLConvertible) -> Request<DataRequest> {
-        return Request<DataRequest>(requestTarget: DataRequest(url: url))
+        return Request<DataRequest>(
+            requestTarget: DataRequest(
+                url: url
+            )
+        )
     }
     
     /**
@@ -120,7 +140,12 @@ public extension Request {
      */
     @discardableResult
     static func download(from downloadURL: URLConvertible, to destinationURL: URLConvertible? = nil) -> Request<DownloadRequest> {
-        return Request<DownloadRequest>(requestTarget: DownloadRequest(downloadURL: downloadURL, destinationURL: destinationURL))
+        return Request<DownloadRequest>(
+            requestTarget: DownloadRequest(
+                downloadURL: downloadURL,
+                destinationURL: destinationURL
+            )
+        )
     }
     
     /**
@@ -142,7 +167,12 @@ public extension Request {
      */
     @discardableResult
     static func upload(file fileURL: URLConvertible, to destinationURL: URLConvertible) -> Request<UploadRequest> {
-        return Request<UploadRequest>(requestTarget: UploadRequest(fileURL: fileURL, destinationURL: destinationURL))
+        return Request<UploadRequest>(
+            requestTarget: UploadRequest(
+                fileURL: fileURL,
+                destinationURL: destinationURL
+            )
+        )
     }
     
     /**
@@ -164,7 +194,12 @@ public extension Request {
      */
     @discardableResult
     static func upload(data fileData: Data, to destinationURL: URLConvertible) -> Request<UploadRequest> {
-        return Request<UploadRequest>(requestTarget: UploadRequest(fileData: fileData, destinationURL: destinationURL))
+        return Request<UploadRequest>(
+            requestTarget: UploadRequest(
+                fileData: fileData,
+                destinationURL: destinationURL
+            )
+        )
     }
     
     /**
@@ -189,12 +224,36 @@ public extension Request {
      */
     @discardableResult
     static func multipart(multipartFormData: MultipartRequest.MultipartFormDataPreparation, to destinationURL: URLConvertible) -> Request<MultipartRequest> {
-        return Request<MultipartRequest>(requestTarget: MultipartRequest(multipartFormDataPreparation: multipartFormData, destinationURL: destinationURL))
+        return Request<MultipartRequest>(
+            requestTarget: MultipartRequest(
+                multipartFormDataPreparation: multipartFormData,
+                destinationURL: destinationURL
+            )
+        )
     }
 }
 
-extension Request {
+/**
+ Operation task handler builder
+ */
+public extension Request {
     
+    /**
+     Set attempts to retry.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+        .plain("http://sample.com/get")
+        .retry(3)
+        .perform()
+     
+     ````
+     
+     - Parameter retryCount: Number of attempts for request.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     func retry(_ retryCount: Int) -> Self {
         
@@ -203,6 +262,23 @@ extension Request {
         return self
     }
     
+    /**
+     Set callback DispatchQueue.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .plain("http://sample.com/get")
+         .callbackQueue(DispatchQueue.main)
+         .progress({ print($0) }) // Will be called on main queue
+         .perform()
+     
+     ````
+     
+     - Parameter queue: DispatchQueue where callback will be called.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     func callbackQueue(_ queue: DispatchQueue) -> Self {
         
@@ -211,6 +287,22 @@ extension Request {
         return self
     }
     
+    /**
+     Set progress closure.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .plain("http://sample.com/get")
+         .progress({ print($0) })
+         .perform()
+     
+     ````
+     
+     - Parameter progressHandler: Closure which be called each time when progress changed.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     func progress(_ progressHandler: @escaping ProgressHandler) -> Self {
         
@@ -219,6 +311,24 @@ extension Request {
         return self
     }
     
+    /**
+     Set completion closure.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .plain("http://sample.com/get")
+         .completion({ result in
+            print(result.value)
+         })
+         .perform()
+     
+     ````
+     
+     - Parameter completionHandler: Closure which be called when request end executing.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     func completion(_ completionHandler: @escaping CompletionHandler) -> Self {
         
@@ -228,43 +338,27 @@ extension Request {
     }
 }
 
-public class DataRequest: Requestable {
+/**
+ Data request builder
+ */
+public extension Request where RequestTarget: DataRequest {
     
-    public var url: URLConvertible
-    public var method: HTTPMethod
-    public var parameters: HTTPParameters?
-    public var headers: HTTPHeaders?
-    public var encoder: RequestEncoderType?
-    
-    public init(url: URLConvertible, method: HTTPMethod = .get, parameters: HTTPParameters? = nil, headers: HTTPHeaders? = nil) {
-        self.url = url
-        self.method = method
-        self.parameters = parameters
-        self.headers = headers
-    }
-    
-    public func asURLRequest() throws -> URLRequest {
-        
-        let url = try self.url.asURL()
-        var request = URLRequest(url: url)
-        request.httpMethod = self.method.rawValue
-        request.allHTTPHeaderFields = self.headers
-        
-        let encoder = self.encoder ?? RequestEncoder.auto
-        
-        return try encoder.encode(request: request, withParameters: self.parameters)
-    }
-    
-    public func asURLSessionTask(session: URLSession) throws -> URLSessionTask {
-        
-        let request = try self.asURLRequest()
-        
-        return session.dataTask(with: request)
-    }
-}
-
-extension Request where RequestTarget: DataRequest {
-    
+    /**
+     Set HTTP method of request.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .plain("http://sample.com/get")
+         .method(.get)
+         .perform()
+     
+     ````
+     
+     - Parameter method: HTTPMethod of request.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     func method(_ method: HTTPMethod) -> Self {
 
@@ -272,106 +366,116 @@ extension Request where RequestTarget: DataRequest {
 
         return self
     }
-    
+
+    /**
+     Set parameters of request.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .plain("http://sample.com/get")
+         .method(.get)
+         .parameters(["username":"user1235"]
+         .perform()
+     
+     ````
+     
+     - Parameter parameters: Parameters of request.
+     - Parameter rewrite: Flag if existing parameters should being overrided.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     func parameters(_ parameters: HTTPParameters, rewrite: Bool = false) -> Self {
-
-        self.requestTarget.parameters = parameters
+        
+        if self.requestTarget.parameters == nil {
+            self.requestTarget.parameters = parameters
+        } else {
+            self.requestTarget.parameters?.set(parameters, rewrite: rewrite)
+        }
 
         return self
     }
 
+    /**
+     Set parameters of request.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .plain("http://sample.com/get")
+         .method(.get)
+         .parameters(["username":"user1235"]
+         .headers(["token":"g7ak1p1vS9a23fSa3"]
+         .perform()
+     
+     ````
+     
+     - Parameter headers: Headers of request.
+     - Parameter rewrite: Flag if existing headers should being overrided.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     func headers(_ headers: HTTPHeaders, rewrite: Bool = false) -> Self {
 
-        if rewrite {
+        if self.requestTarget.headers == nil {
             self.requestTarget.headers = headers
         } else {
-            if self.requestTarget.headers == nil {
-                self.requestTarget.headers = headers
-            } else {
-                headers.forEach({ self.requestTarget.headers![$0] = $1 })
-            }
+            self.requestTarget.headers?.set(headers, rewrite: rewrite)
         }
 
         return self
-    }   
+    }
     
+    /**
+     Set encoding of request.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .plain("http://sample.com/get")
+         .method(.get)
+         .parameters(["username":"user1235"]
+         .perform()
+     
+     ````
+     
+     - Parameter encoder: Encoder of request. There few default encoders RequestEncoder.query, .body, .json and .auto which depends of request HTTPMethod.
+     - Parameter rewrite: Flag if existing parameters should being overrided.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     func encoding(_ encoder: RequestEncoder) -> Self {
-
+        
         self.requestTarget.encoder = encoder
 
         return self
     }
 }
 
-public class DownloadRequest: DataRequest {
-    
-    init(downloadURL: URLConvertible, destinationURL: URLConvertible?) {
-        super.init(url: downloadURL)
-    }
-    
-    override public func asURLSessionTask(session: URLSession) throws -> URLSessionTask {
-        
-        let request = try self.asURLRequest()
-        
-        return session.downloadTask(with: request)
-    }
-}
-
-public class UploadRequest: DataRequest {
-    
-    enum UploadType {
-        case file(url: URLConvertible)
-        case data(data: Data)
-    }
-    
-    private(set) var uploadType: UploadType
-    
-    public var fileName:   String = "\(Int(Date().timeIntervalSince1970))"
-    public var fieldName:  String = "userfile"
-    public var mimeType:   String = "application/json"
-    
-    init(fileURL: URLConvertible, destinationURL: URLConvertible) {
-        
-        self.uploadType = .file(url: fileURL)
-        
-        super.init(url: destinationURL, method: .post)
-    }
-    
-    init(fileData: Data, destinationURL: URLConvertible) {
-        
-        self.uploadType = .data(data: fileData)
-        
-        super.init(url: destinationURL, method: .post)
-    }
-    
-    public override func asURLRequest() throws -> URLRequest {
-        
-        var request = try super.asURLRequest()
-        
-        request.setValue("\(self.mimeType)", forHTTPHeaderField: "Content-Type")
-        request.setValue("attachment; filename=\"\(self.fileName)\"", forHTTPHeaderField: "Content-Disposition")
-        
-        return request
-    }
-    
-    override public func asURLSessionTask(session: URLSession) throws -> URLSessionTask {
-        
-        let request = try self.asURLRequest()
-        
-        switch self.uploadType {
-        case let .file(url):
-            return session.uploadTask(with: request, fromFile: try url.asURL())
-        case let .data(data):
-            return session.uploadTask(with: request, from: data)
-        }
-    }
-}
-
+/**
+ Upload task builder
+ */
 public extension Request where RequestTarget: UploadRequest {
     
+    /**
+     Set file name of data.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .upload(data: imageData, to: "http://sample.com/upload/avatar")
+         .fileName("avatar.jpeg")
+         .perform()
+     
+     ````
+     
+     - Parameter fileName: File name of file data.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     public func fileName(_ fileName: String) -> Self {
         
@@ -380,6 +484,22 @@ public extension Request where RequestTarget: UploadRequest {
         return self
     }
     
+    /**
+     Set field name of data.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .upload(data: imageData, to: "http://sample.com/upload/avatar")
+         .fieldName("avatar")
+         .perform()
+     
+     ````
+     
+     - Parameter fieldName: Field name of file data.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     public func fieldName(_ fieldName: String) -> Self {
         
@@ -388,137 +508,27 @@ public extension Request where RequestTarget: UploadRequest {
         return self
     }
     
+    /**
+     Set mime type of data.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+         .upload(data: imageData, to: "http://sample.com/upload/avatar")
+         .mimeType("image/jpeg")
+         .perform()
+     
+     ````
+     
+     - Parameter mimeType: Mime type of file data.
+     - Returns: Request container to continue building request.
+     */
     @discardableResult
     public func mimeType(_ mimeType: String) -> Self {
         
         self.requestTarget.mimeType = mimeType
         
         return self
-    }
-}
-
-public class MultipartRequest: DataRequest {
-    
-    public typealias MultipartFormDataPreparation = ((MultipartFormData) -> Void)
-    
-    private let multipartFormData: MultipartFormData
-    
-    public init(multipartFormDataPreparation: MultipartFormDataPreparation, destinationURL: URLConvertible) {
-        
-        let multipartFormData = MultipartFormData()
-        
-        multipartFormDataPreparation(multipartFormData)
-        
-        self.multipartFormData = multipartFormData
-        
-        super.init(url: destinationURL, method: .post)
-    }
-    
-    public class MultipartFormData {
-        
-        struct EncodingCharacters {
-            static let crlf = "\r\n"
-        }
-        
-        private var boundary: String = UUID().uuidString
-        
-        private class BodyPart {
-            
-            enum PartPosition {
-                case initial
-                case encapsulated
-                case final
-            }
-            
-            public var partPosition: PartPosition = .encapsulated
-            
-            private(set) var fileData:   Data
-            private(set) var fileName:   String = "\(Int(Date().timeIntervalSince1970))"
-            private(set) var fieldName:  String = "userfile"
-            private(set) var mimeType:   String = "application/json"
-            
-            init(fileData: Data, fieldName: String, fileName: String, mimeType: String) {
-                self.fileData = fileData
-                self.fieldName = fieldName
-                self.fileName = fileName
-                self.mimeType = mimeType
-            }
-            
-            private func boundaryStartString(boundary: String) -> String {
-                return "--\(boundary)" + EncodingCharacters.crlf
-            }
-            
-            private func boundaryEncapsulatedString(boundary: String) -> String {
-                return EncodingCharacters.crlf + "--\(boundary)" + EncodingCharacters.crlf
-            }
-            
-            private func boundaryEndString(boundary: String) -> String {
-                return EncodingCharacters.crlf + "--\(boundary)--" + EncodingCharacters.crlf
-            }
-            
-            private func contentDispositionString() -> String {
-                return "Content-Disposition: form-data; name=\"\(self.fieldName)\"; filename=\"\(self.fileName)\"" + EncodingCharacters.crlf
-            }
-            
-            private func contentTypeString() -> String {
-                return "Content-Type: \(self.mimeType)" + EncodingCharacters.crlf + EncodingCharacters.crlf
-            }
-            
-            public func write(to data: inout Data, boundary: String) throws {
-                
-                if case PartPosition.initial = self.partPosition {
-                    data.append(try self.boundaryStartString(boundary: boundary).asData())
-                } else {
-                    data.append(try self.boundaryEncapsulatedString(boundary: boundary).asData())
-                }
-                
-                data.append(try self.contentDispositionString().asData())
-                data.append(try self.contentTypeString().asData())
-                data.append(try self.fileData.asData())
-                data.append(try EncodingCharacters.crlf.asData())
-                
-                if case PartPosition.final = self.partPosition {
-                    data.append(try self.boundaryEndString(boundary: boundary).asData())
-                }
-            }
-        }
-        
-        private var bodyParts: [BodyPart] = []
-        
-        public func append(fileData: Data, fieldName: String, fileName: String, mimeType: String) {
-            self.bodyParts.append(.init(fileData: fileData, fieldName: fieldName, fileName: fileName, mimeType: mimeType))
-        }
-        
-        public func encode(request: URLRequest) throws -> URLRequest {
-            
-            var request = request
-            
-            request.setValue("multipart/form-data; boundary=\(self.boundaryString())", forHTTPHeaderField: "Content-Type")
-            
-            try request.httpBody = {
-                
-                var data = Data()
-                let boundary = self.boundaryString()
-                
-                self.bodyParts.first?.partPosition = .initial
-                self.bodyParts.last?.partPosition = .final
-                
-                try self.bodyParts.forEach({
-                    try $0.write(to: &data, boundary: boundary)
-                })
-                
-                return data
-            }()
-            
-            return request
-        }
-        
-        private func boundaryString() -> String {
-            return "Boundary-\(self.boundary)"
-        }
-    }
-    
-    override public func asURLRequest() throws -> URLRequest {
-        return try self.multipartFormData.encode(request: try super.asURLRequest())
     }
 }

@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Protocol of request executing process delegating
 public protocol OperationTaskDelegate {
     
     var completionHandler: CompletionHandler? { get }
@@ -16,26 +17,54 @@ public protocol OperationTaskDelegate {
     var retryCount: Int { get }
 }
 
+/**
+ Basic request provider which can perform requests and handle network responses
+ */
 public class Provider: NSObject {
     
+    /// Default provider
     public static let shared: Provider = Provider()
     
+    /// Provider executing errors
     public enum ProviderError: Error {
         case unknown
     }
     
+    /// Request response handler
+    private var responseHandler: ResponseHandler = ResponseHandler()
+    /// Queue where operations will be performed
+    private var operationQueue:  OperationQueue = OperationQueue()
+    /// Current executing operation tasks
+    private var operationTasks:  [OperationTask] = []
+    /// Default provider URLSession
+    private(set) lazy var session: URLSession = URLSession(
+        configuration: .default,
+        delegate: self,
+        delegateQueue: self.operationQueue
+    )
+}
+
+extension Provider {
+    
+    /**
+     Class which represents request performing in action
+     */
     public class OperationTask: NSObject {
         
+        /// Executing process delegate
         private(set) var delegate: OperationTaskDelegate
         
         private(set) var originalRequest: Requestable
         private(set) var sessionTask: URLSessionTask
         private(set) var request: URLRequest
         
+        /// Attempts left to retry
         public var retryCount: Int = 0
+        /// Buffer data, where the loaded bytes are written
         public var buffer: Data = Data()
+        /// Request response object
         public var response: URLResponse?
-        
+        /// Callback queue
         public var callbackQueue: DispatchQueue {
             return self.delegate.callbackQueue ?? .global(qos: .background)
         }
@@ -50,6 +79,7 @@ public class Provider: NSObject {
             self.retryCount = delegate.retryCount
         }
         
+        /// Method which notify delegate about current progress
         public func progress(_ progress: Float) {
             if let progressHandler = self.delegate.progressHandler {
                 self.callbackQueue.async {
@@ -58,6 +88,7 @@ public class Provider: NSObject {
             }
         }
         
+        /// Method which notify delegate about request executing completion
         public func completion(_ result: Result<Response, Error>) {
             
             defer {
@@ -71,6 +102,7 @@ public class Provider: NSObject {
             }
         }
         
+        /// Method which try to retry operation task in failure case
         public func retry(session: URLSession) {
             do {
                 
@@ -86,20 +118,11 @@ public class Provider: NSObject {
             }
         }
     }
-    
-    private var responseHandler: ResponseHandler = ResponseHandler()
-    private var operationQueue:  OperationQueue = OperationQueue()
-    private var operationTasks:  [OperationTask] = []
-    
-    private(set) lazy var session: URLSession = URLSession(
-        configuration: .default,
-        delegate: self,
-        delegateQueue: self.operationQueue
-    )
 }
 
 extension Provider {
     
+    /// Method which try to perform request
     public func perform(request: Requestable, delegate: OperationTaskDelegate) {
         do {
             
@@ -115,7 +138,8 @@ extension Provider {
             }
         }
     }
-    
+        
+    /// Method which cancel request if exists
     public func cancel(request: Requestable) {
         
         guard let request = try? request.asURLRequest() else {
@@ -136,8 +160,12 @@ extension Provider {
     }
 }
 
+/**
+ Conforming provider to URLSessionDelegate
+ */
 extension Provider: URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDelegate, URLSessionDownloadDelegate {
     
+    /// On recieve data task response set operation task response and allow executing
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
 
         defer {            
@@ -151,6 +179,7 @@ extension Provider: URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDe
         operationTask.response = response
     }
     
+    /// On finish downloading get data from location and set it in operation task buffer
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         
         guard let operationTask = self.operationTasks.first(where: { $0.sessionTask === downloadTask }) else {
@@ -162,6 +191,7 @@ extension Provider: URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDe
         }
     }
     
+    /// On write downloaded bytes determine the percentage of progress and notify delegate
     public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         
         guard let operationTask = self.operationTasks.first(where: { $0.sessionTask === downloadTask }) else {
@@ -173,6 +203,7 @@ extension Provider: URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDe
         operationTask.progress(progress)
     }
     
+    /// On sent bytes to network determine the percentage of progress and notify delegate
     public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
         
         guard let operationTask = self.operationTasks.first(where: { $0.sessionTask === task }) else {
@@ -184,6 +215,7 @@ extension Provider: URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDe
         operationTask.progress(progress)
     }
     
+    /// On recieve part of response data save it to operation task buffer
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
 
         guard let operationTask = self.operationTasks.first(where: { $0.sessionTask === dataTask }) else {
@@ -192,7 +224,8 @@ extension Provider: URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDe
 
         operationTask.buffer = data
     }
-    
+        
+    /// On completion executing trying to retry if fails, else notifiy delegate about completion
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
 
         guard let operationTask = self.operationTasks.first(where: { $0.sessionTask === task }) else {

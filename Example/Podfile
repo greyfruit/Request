@@ -1,6 +1,4 @@
 use_frameworks!
 target 'Request_Tests' do
   pod 'Request', :path => '../'
-  
-  
 end

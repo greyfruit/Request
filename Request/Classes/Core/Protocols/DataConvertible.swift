@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Protocol which represents data convertible object
 protocol DataConvertible {
     func asData() throws -> Data
 }

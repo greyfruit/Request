@@ -8,18 +8,27 @@
 
 import Foundation
 
+/// Protocol which represents request encoder object
 public protocol RequestEncoderType {
     
     func encode(request: URLRequest, withParameters parameters: HTTPParameters?) throws -> URLRequest
 }
 
+/**
+ Basic request encoder
+ */
 public struct RequestEncoder: RequestEncoderType {
     
+    /// Automatic encoding depends on HTTP method of request
     static public var auto:     RequestEncoder = RequestEncoder(destination: .methodDependent)
+    /// Query encoding in request url string as url parameters
     static public var query:    RequestEncoder = RequestEncoder(destination: .query)
+    /// Body encoding in request body as url parameters
     static public var body:     RequestEncoder = RequestEncoder(destination: .body)
+    /// JSON encoding in request body as json format
     static public var json:     RequestEncoder = RequestEncoder(destination: .json)
     
+    /// Encoding type
     public enum Destination {
         case methodDependent
         case query
@@ -33,6 +42,7 @@ public struct RequestEncoder: RequestEncoderType {
         self.destination = destination
     }
     
+    /// Method which modify input request and returns encoded request
     public func encode(request: URLRequest, withParameters parameters: HTTPParameters?) throws -> URLRequest {
         
         var request = request
@@ -43,7 +53,7 @@ public struct RequestEncoder: RequestEncoderType {
         
         func queryEncode() {
             
-            if let url = request.url, var queryComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            if let url = request.url, let queryComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) {
 //                queryComponents.percentEncodedQuery = (queryComponents.percentEncodedQuery.map({ $0 + "&" }) ?? String.empty) + self.query(parameters: parameters)
                 request.url = queryComponents.url
             }
