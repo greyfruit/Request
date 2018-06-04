@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Request'
-  s.version          = '0.1.1'
+  s.version          = '0.1.4'
   s.summary          = 'A short description of Request.'
   s.swift_version    = '4.1'
 

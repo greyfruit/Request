@@ -1,6 +1,5 @@
 # Request
 
-[![CI Status](http://img.shields.io/travis/greyfruit/Request.svg?style=flat)](https://travis-ci.org/greyfruit/Request)
 [![Version](https://img.shields.io/cocoapods/v/Request.svg?style=flat)](http://cocoapods.org/pods/Request)
 [![License](https://img.shields.io/cocoapods/l/Request.svg?style=flat)](http://cocoapods.org/pods/Request)
 [![Platform](https://img.shields.io/cocoapods/p/Request.svg?style=flat)](http://cocoapods.org/pods/Request)
