@@ -99,7 +99,7 @@ public func plain(_ url: URLConvertible) -> Request<DataRequest> {
     return Request<DataRequest>(requestTarget: DataRequest(url: url))
 }
 
-extension Request {        
+public extension Request {
     
     
     
@@ -308,7 +308,7 @@ extension Request where RequestTarget: DataRequest {
     }
 }
 
-class DownloadRequest: DataRequest {
+public class DownloadRequest: DataRequest {
     
     init(downloadURL: URLConvertible, destinationURL: URLConvertible?) {
         super.init(url: downloadURL)
