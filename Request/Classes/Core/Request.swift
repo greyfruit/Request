@@ -78,28 +78,30 @@ public class Request<RequestTarget: Requestable> {
     }
 }
 
+/**
+ 
+ Creates **basic** request.
+ 
+ ### Usage Example: ###
+ ````
+ 
+ Request
+ .plain("http://sample.com/path")
+ .perform()
+ 
+ ````
+ 
+ - Parameter url: The path by which the request will be executed.
+ - Returns: Request container to build basic HTTP request.
+ */
+@discardableResult
+public func plain(_ url: URLConvertible) -> Request<DataRequest> {
+    return Request<DataRequest>(requestTarget: DataRequest(url: url))
+}
+
 extension Request {        
     
-    /**
-     
-     Creates **basic** request.
-     
-     ### Usage Example: ###
-     ````
-     
-     Request
-        .plain("http://sample.com/path")
-        .perform()
-     
-     ````
-     
-     - Parameter url: The path by which the request will be executed.
-     - Returns: Request container to build basic HTTP request.
-     */
-    @discardableResult
-    static func plain(_ url: URLConvertible) -> Request<DataRequest> {
-        return Request<DataRequest>(requestTarget: DataRequest(url: url))
-    }
+    
     
     /**
      
