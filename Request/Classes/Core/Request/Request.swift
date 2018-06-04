@@ -78,30 +78,28 @@ public class Request<RequestTarget: Requestable> {
     }
 }
 
-/**
- 
- Creates **basic** request.
- 
- ### Usage Example: ###
- ````
- 
- Request
- .plain("http://sample.com/path")
- .perform()
- 
- ````
- 
- - Parameter url: The path by which the request will be executed.
- - Returns: Request container to build basic HTTP request.
- */
-@discardableResult
-public func plain(_ url: URLConvertible) -> Request<DataRequest> {
-    return Request<DataRequest>(requestTarget: DataRequest(url: url))
-}
-
 public extension Request {
     
-    
+    /**
+     
+     Creates **basic** request.
+     
+     ### Usage Example: ###
+     ````
+     
+     Request
+     .plain("http://sample.com/path")
+     .perform()
+     
+     ````
+     
+     - Parameter url: The path by which the request will be executed.
+     - Returns: Request container to build basic HTTP request.
+     */
+    @discardableResult
+    static func plain(_ url: URLConvertible) -> Request<DataRequest> {
+        return Request<DataRequest>(requestTarget: DataRequest(url: url))
+    }
     
     /**
      
@@ -331,7 +329,7 @@ public class UploadRequest: DataRequest {
     
     private(set) var uploadType: UploadType
     
-    public var fileName:   String = Int(Date().timeIntervalSince1970).string
+    public var fileName:   String = "\(Int(Date().timeIntervalSince1970))"
     public var fieldName:  String = "userfile"
     public var mimeType:   String = "application/json"
     
@@ -435,7 +433,7 @@ public class MultipartRequest: DataRequest {
             public var partPosition: PartPosition = .encapsulated
             
             private(set) var fileData:   Data
-            private(set) var fileName:   String = Int(Date().timeIntervalSince1970).string
+            private(set) var fileName:   String = "\(Int(Date().timeIntervalSince1970))"
             private(set) var fieldName:  String = "userfile"
             private(set) var mimeType:   String = "application/json"
             
